@@ -8,6 +8,7 @@
 package mauview
 
 import (
+	"fmt"
 	"go.mau.fi/tcell"
 )
 
@@ -83,7 +84,27 @@ func (b *Button) Draw(screen Screen) {
 	}
 	screen.SetStyle(style)
 	screen.Clear()
-	PrintWithStyle(screen, b.text, 0, 0, width, AlignCenter, style)
+	buttonText := b.text
+
+	// Render button for monochrome
+	if screen.Colors() == 0 {
+		leftPad := (width + len(buttonText)) / 2 - 1
+		if leftPad < 0 {
+			leftPad = 0
+		}
+		rightPad := (width - len(buttonText) - 1) / 2
+		if rightPad < 0 {
+			rightPad = 0
+		}
+		buttonText = fmt.Sprintf("[%*s%*s]",
+			leftPad, buttonText,
+			rightPad, "")
+		if b.focused {
+			style = style.Underline(true)
+		}
+	}
+
+	PrintWithStyle(screen, buttonText, 0, 0, width, AlignCenter, style)
 }
 
 func (b *Button) Submit(event KeyEvent) bool {
