@@ -73,7 +73,12 @@ func (form *Form) OnKeyEvent(event KeyEvent) bool {
 	case tcell.KeyTab:
 		form.FocusNextItem()
 		return true
+	case tcell.KeyDown:
+		form.FocusNextItem()
+		return true
 	case tcell.KeyBacktab:
+		form.FocusPreviousItem()
+	case tcell.KeyUp:
 		form.FocusPreviousItem()
 		return true
 	case tcell.KeyEnter:
