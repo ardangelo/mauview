@@ -16,6 +16,8 @@ type Button struct {
 	text         string
 	style        tcell.Style
 	focusedStyle tcell.Style
+	monochromeStyle tcell.Style
+	monochromeFocusedStyle tcell.Style
 	focused      bool
 	onClick      func()
 }
@@ -25,6 +27,11 @@ func NewButton(text string) *Button {
 		text:         text,
 		style:        tcell.StyleDefault.Background(Styles.ContrastBackgroundColor).Foreground(Styles.PrimaryTextColor),
 		focusedStyle: tcell.StyleDefault.Background(Styles.MoreContrastBackgroundColor).Foreground(Styles.PrimaryTextColor),
+
+		monochromeStyle: tcell.StyleDefault.
+			Background(tcell.ColorBlack).Foreground(tcell.ColorWhite),
+		monochromeFocusedStyle: tcell.StyleDefault.
+			Background(tcell.ColorWhite).Foreground(tcell.ColorBlack),
 	}
 }
 
@@ -78,8 +85,15 @@ func (b *Button) Blur() {
 
 func (b *Button) Draw(screen Screen) {
 	width, _ := screen.Size()
+
 	style := b.style
-	if b.focused {
+	if screen.Colors() == 0 {
+		if b.focused {
+			style = b.monochromeFocusedStyle
+		} else {
+			style = b.monochromeStyle
+		}
+	} else if b.focused {
 		style = b.focusedStyle
 	}
 	screen.SetStyle(style)
@@ -99,9 +113,6 @@ func (b *Button) Draw(screen Screen) {
 		buttonText = fmt.Sprintf("[%*s%*s]",
 			leftPad, buttonText,
 			rightPad, "")
-		if b.focused {
-			style = style.Underline(true)
-		}
 	}
 
 	PrintWithStyle(screen, buttonText, 0, 0, width, AlignCenter, style)

@@ -17,6 +17,7 @@ type gridChild struct {
 	relHeight int
 	relX      int
 	relY      int
+	focusable bool
 }
 
 type Grid struct {
@@ -62,7 +63,7 @@ func (form *Form) SetOnFocusChanged(fn func(from, to Component)) *Form {
 	return form
 }
 
-func (grid *Grid) createChild(comp Component, x, y, width, height int) *gridChild {
+func (grid *Grid) createChild(comp Component, x, y, width, height int, focusable bool) *gridChild {
 	if x+width >= len(grid.columnWidths) {
 		grid.columnWidths = extend(grid.columnWidths, x+width)
 	}
@@ -78,6 +79,7 @@ func (grid *Grid) createChild(comp Component, x, y, width, height int) *gridChil
 		relHeight: height,
 		relX:      x,
 		relY:      y,
+		focusable: focusable,
 	}
 }
 
@@ -93,7 +95,7 @@ func (grid *Grid) addChild(child *gridChild) {
 }
 
 func (grid *Grid) AddComponent(comp Component, x, y, width, height int) *Grid {
-	grid.addChild(grid.createChild(comp, x, y, width, height))
+	grid.addChild(grid.createChild(comp, x, y, width, height, true /* focusable */))
 	return grid
 }
 

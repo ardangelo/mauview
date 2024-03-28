@@ -34,25 +34,54 @@ func (form *Form) Draw(screen Screen) {
 func (form *Form) FocusNextItem() {
 	for i := 0; i < len(form.items)-1; i++ {
 		if form.focused == form.items[i] {
-			form.setFocused(form.items[i+1])
-			return
+			for j := i + 1; j < len(form.items); j++ {
+				if form.items[j].focusable {
+					form.setFocused(form.items[j])
+					return
+				}
+			}
+			break
 		}
 	}
-	form.setFocused(form.items[0])
+
+	for i := 0; i < len(form.items); i++ {
+		if form.items[i].focusable {
+			form.setFocused(form.items[i])
+			break
+		}
+	}
 }
 
 func (form *Form) FocusPreviousItem() {
 	for i := len(form.items) - 1; i > 0; i-- {
 		if form.focused == form.items[i] {
-			form.setFocused(form.items[i-1])
-			return
+			for j := i - 1; j >= 0; j-- {
+				if form.items[j].focusable {
+					form.setFocused(form.items[j])
+					return
+				}
+			}
+			break
 		}
 	}
-	form.setFocused(form.items[len(form.items)-1])
+
+	for i := len(form.items) - 1; i >= 0; i-- {
+		if form.items[i].focusable {
+			form.setFocused(form.items[i])
+			break
+		}
+	}
 }
 
 func (form *Form) AddFormItem(comp Component, x, y, width, height int) *Form {
-	child := form.Grid.createChild(comp, x, y, width, height)
+	child := form.Grid.createChild(comp, x, y, width, height, true /* focusable */)
+	form.items = append(form.items, child)
+	form.Grid.addChild(child)
+	return form
+}
+
+func (form *Form) AddFormItemUnfocusable(comp Component, x, y, width, height int) *Form {
+	child := form.Grid.createChild(comp, x, y, width, height, false /* unfocusable */)
 	form.items = append(form.items, child)
 	form.Grid.addChild(child)
 	return form
